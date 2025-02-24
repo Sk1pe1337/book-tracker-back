@@ -39,7 +39,7 @@ app.set("trust proxy", 1);
 // --- Настройка CORS ---
 app.use(
   cors({
-    origin: "https://book-tracker-front.onrender.com", // ✅ Разрешаем фронтенд
+    origin: "https://book-tracker-front-k36x.onrender.com", // ✅ Разрешаем фронтенд
     methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
     allowedHeaders: "Content-Type,Authorization",
     credentials: true, // ✅ Разрешаем cookies и токены
