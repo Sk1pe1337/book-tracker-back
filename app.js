@@ -34,12 +34,15 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
+
+app.set('trust proxy', 1);
+
 // --- Настройка CORS ---
 app.use(cors({
-  origin: "*",
-  methods: "*",
-  credentials: true,
-  allowedHeaders:"*",
+  origin: 'https://book-tracker-front.onrender.com', // Указываем точный URL фронтенда
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // Указываем разрешенные методы
+  allowedHeaders: ['Content-Type', 'Authorization'], // Разрешенные заголовки
+  credentials: true // Разрешаем отправку cookies и токенов
 }));
 
 // --- Middleware ---
