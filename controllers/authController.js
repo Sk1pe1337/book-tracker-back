@@ -46,23 +46,26 @@ const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ email }).select('+password');
+    const user = await User.findOne({ email }).select("+password");
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '30d' });
+      const token = jwt.sign(
+        { id: user._id, role: user.role },
+        process.env.JWT_SECRET,
+        { expiresIn: "30d" }
+      );
       console.log("Generated JWT:", token);
 
-      res.cookie('jwt', token, {
+      res.cookie("jwt", token, {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
+        secure: true, // ✅ Обязательно для HTTPS (Render)
+        sameSite: "None", // ✅ Разрешает кросс-доменные запросы
         maxAge: 30 * 24 * 60 * 60 * 1000,
       });
 
-      // ✅ Теперь отправляем токен в ответе!
-      res.json({ message: 'Login successful', userId: user._id, token });
+      res.json({ message: "Login successful", userId: user._id, token });
     } else {
-      res.status(401).json({ message: 'Invalid email or password' });
+      res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,20 +74,33 @@ const login = async (req, res) => {
 
 
 // ✅ Выход из системы (Logout)
+// ✅ Выход из системы (Logout)
 const logout = async (req, res) => {
-  res.clearCookie('jwt', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'Strict' });
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  });
 
-  res.json({ message: 'Logged out successfully' });
+  res.json({ message: "Logged out successfully" });
 };
 
 
 // ✅ Получение профиля пользователя
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password'); // Исключаем пароль
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+    const token = req.cookies.jwt; // 📌 Читаем токен из cookies
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
     }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     res.json(user);
   } catch (error) {
     res.status(500).json({ message: error.message });
