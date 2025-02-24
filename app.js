@@ -9,7 +9,7 @@ const morgan = require('morgan');
 const helmet = require('helmet'); // Защита от атак
 const rateLimit = require('express-rate-limit'); // Ограничение запросов
 
-const connectDB = require('./config/db');
+ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const bookRoutes = require('./routes/bookRoutes'); // 📌 Исправлен путь
 const { protect } = require('./middleware/authMiddleware');
@@ -36,10 +36,10 @@ app.use(limiter);
 
 // --- Настройка CORS ---
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000', 
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'], // ✅ Добавлен `PATCH`
+  origin: "*",
+  methods: "*",
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders:"*",
 }));
 
 // --- Middleware ---
